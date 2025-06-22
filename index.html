@@ -145,15 +145,6 @@
         const penguinText = document.getElementById('penguin-text');
 
         generateBtn.addEventListener('click', async () => {
-            const apiKey = "AIzaSyBeI8y4v-TzZuoEA6MFDcy62jU4O9UwMZE"; //
-            
-            if (!apiKey || apiKey === "AIzaSyBeI8y4v-TzZuoEA6MFDcy62jU4O9UwMZE") {
-                resetUI();
-                showError("APIキーが設定されていません。コード内の 'apiKey' 変数に、あなたが取得したGoogle AI StudioのAPIキーを設定してください。");
-                penguinText.textContent = "APIキーがないと動けんぞ。";
-                return;
-            }
-            
             const userInput = keywordsInput.value.trim();
             if (!userInput) {
                 showError('何かキーワードをくれ。でないと始まらん。');
