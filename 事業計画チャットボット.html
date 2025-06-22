@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI事業計画ジェネレーター feat. ペンギンさん</title>
+    <!-- Tailwind CSSの読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Noto Sans JP) の読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f3f4f6; /* 明るいグレー */
+        }
+        /* ボタンのスタイル */
+        .btn-main {
+            background-color: #2563eb; /* ブルー */
+            transition: all 0.3s ease;
+        }
+        .btn-main:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        /* ローディングスピナー */
+        .loader {
+            border-color: rgba(37, 99, 235, 0.2);
+            border-top-color: #2563eb;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* 吹き出しのデザイン */
+        .speech-bubble {
+            position: relative;
+            background: #ffffff;
+            border-radius: .4em;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 0;
+            height: 0;
+            border: 20px solid transparent;
+            border-right-color: #ffffff;
+            border-left: 0;
+            border-top: 0;
+            margin-top: -10px;
+            margin-left: -20px;
+        }
+        /* モバイル表示用の吹き出し */
+        @media (max-width: 768px) {
+            .speech-bubble:after {
+                left: 50%;
+                top: 0;
+                border: 20px solid transparent;
+                border-bottom-color: #ffffff;
+                border-top: 0;
+                border-right: 0;
+                margin-left: -10px;
+                margin-top: -20px;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+
+        <!-- ヘッダー -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-2">事業計画ジェネレーター</h1>
+            <p class="text-md text-gray-600">ペンギンさんが、あなたのアイデアをビジネスに変えるお手伝い。</p>
+        </header>
+
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+            <!-- キャラクター画像 -->
+            <div class="w-1/2 md:w-1/3 flex-shrink-0 text-center">
+                <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAH0AjoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAr/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AKpgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//Z" alt="ペンギンさん" class="mx-auto rounded-full w-48 h-48 md:w-64 md:h-64 object-cover shadow-2xl border-4 border-white">
+                <div class="mt-4">
+                    <p id="penguin-text" class="text-lg font-bold text-gray-700">どんなビジネスに興味があるんだ？</p>
+                </div>
+            </div>
+
+            <!-- 入力と結果表示エリア -->
+            <div class="w-full md:w-2/3">
+                <!-- 入力フォーム -->
+                <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+                    <div class="mb-4">
+                        <label for="keywords" class="block text-md font-bold text-gray-700 mb-2">
+                            <i class="ph-fill ph-lightbulb align-text-bottom mr-1 text-yellow-500"></i>
+                            事業化したいアイデアのキーワード
+                        </label>
+                        <input type="text" id="keywords" class="w-full bg-gray-100 border-2 border-gray-300 rounded-lg px-4 py-2 text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300" placeholder="例: オンライン家庭教師, カスタマイズPC販売">
+                    </div>
+                    <button id="generate-btn" class="w-full btn-main text-white font-bold py-3 px-4 rounded-lg text-lg flex items-center justify-center">
+                        <i class="ph-fill ph-paper-plane-tilt text-2xl mr-2"></i>
+                        <span>ペンギンさんに相談する</span>
+                    </button>
+                </div>
+                
+                <!-- 結果表示エリア -->
+                <div id="result-container" class="min-h-[200px] relative">
+                    <!-- ローディングスピナー -->
+                    <div id="loader" class="hidden absolute inset-0 flex-col items-center justify-center text-center p-8 bg-white/70 backdrop-blur-sm rounded-xl">
+                        <div class="loader rounded-full border-8 h-16 w-16 mb-4"></div>
+                        <h2 id="loader-text" class="text-lg font-semibold text-gray-700">うーむ、考え中だ...</h2>
+                    </div>
+                    <!-- エラーメッセージ -->
+                    <div id="error-message" class="hidden speech-bubble p-6 border-l-4 border-red-500">
+                        <p class="font-bold flex items-center text-red-700"><i class="ph-fill ph-warning-circle text-2xl mr-2"></i>問題発生だ</p>
+                        <p id="error-text" class="mt-2 ml-8"></p>
+                    </div>
+                    <!-- 生成結果カード -->
+                    <div id="result-card" class="hidden speech-bubble">
+                        <!-- カードのコンテンツはJSで生成 -->
+                    </div>
+                     <!-- 初期表示のメッセージ -->
+                    <div id="initial-message" class="text-center text-gray-500 pt-10">
+                        <p>ここにペンギンさんからの<br>事業計画案が表示されるぞ。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const generateBtn = document.getElementById('generate-btn');
+        const keywordsInput = document.getElementById('keywords');
+        const loader = document.getElementById('loader');
+        const loaderText = document.getElementById('loader-text');
+        const resultCard = document.getElementById('result-card');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const initialMessage = document.getElementById('initial-message');
+        const penguinText = document.getElementById('penguin-text');
+
+        generateBtn.addEventListener('click', async () => {
+            const userInput = keywordsInput.value.trim();
+            if (!userInput) {
+                showError('何かキーワードをくれ。でないと始まらん。');
+                return;
+            }
+
+            resetUI();
+            loader.classList.remove('hidden');
+            initialMessage.classList.add('hidden');
+            penguinText.textContent = `ふむ、「${userInput}」か...いいだろう。`;
+            
+            try {
+                const prompt = `
+                あなたは非常に優秀だが、少し口調が厳しい起業コンサルタントです。見た目はスーツを着たペンギンです。
+                以下のキーワードについて、Web上の最新情報を調査・分析した上で、非常に詳細で具体的な事業計画を提案してください。
+                分析や提案は、厳しくも的確な視点で行ってください。
+
+                キーワード: "${userInput}"
+
+                回答は必ず以下のJSON形式に従ってください。'marketAnalysis'と'references'は、あなたの調査能力を示す上で非常に重要です。具体的かつ専門的な内容にしてください。
+                `;
+
+                const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                
+                // --- payload の修正 ---
+                // エラーの原因だった targetCustomer を properties と required の両方に追加
+                const payload = {
+                    contents: chatHistory,
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                ideaName: { type: "STRING", description: "素人でもわかる、キャッチーな事業アイデアの名称" },
+                                concept: { type: "STRING", description: "この事業の核心を突くコンセプト（300字程度）" },
+                                marketAnalysis: { type: "STRING", description: "Webで調査した市場動向、競合分析、甘い見通しを排除した現実的な分析（500字程度）" },
+                                targetCustomer: { type: "STRING", description: "本当に金を払ってくれるであろう、具体的なターゲット顧客層" },
+                                valueProposition: { type: "STRING", description: "顧客が抱える本当の課題と、それに対する独自の解決策・提供価値" },
+                                revenueModel: { type: "STRING", description: "どうやって儲けるのか。サブスクリプション、手数料など具体的名称を挙げる" },
+                                firstStep: { type: "STRING", description: "言い訳できないくらい具体的で、今日からでも始められる最初のステップ" },
+                                references: {
+                                    type: "ARRAY",
+                                    description: "分析の根拠となったWeb上の情報源（最低3つ）。実在しそうなタイトルとURLを記載する。",
+                                    items: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            title: { type: "STRING" },
+                                            url: { type: "STRING" }
+                                        },
+                                        required: ["title", "url"]
+                                    }
+                                }
+                            },
+                            required: ["ideaName", "concept", "marketAnalysis", "targetCustomer", "valueProposition", "revenueModel", "firstStep", "references"]
+                        }
+                    }
+                };
+                
+                const apiKey = ""; // APIキーは不要です
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error ? `API Error: ${errorData.error.message}` : 'APIリクエストに失敗した。サーバーが混んでいるかもしれんな。');
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    const businessPlan = JSON.parse(text);
+                    displayResult(businessPlan);
+                    penguinText.textContent = "どうだ、これが俺からの提案だ。";
+                } else {
+                    throw new Error('AIからまともな回答が得られんだった。もっとマシなキーワードで試せ。');
+                }
+
+            } catch (error) {
+                console.error("Error:", error);
+                showError(error.message);
+                penguinText.textContent = "おっと、何か問題があったようだ。";
+            } finally {
+                loader.classList.add('hidden');
+            }
+        });
+
+        function resetUI() {
+            errorMessage.classList.add('hidden');
+            resultCard.classList.add('hidden');
+            resultCard.innerHTML = '';
+            initialMessage.classList.remove('hidden');
+        }
+
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+            initialMessage.classList.add('hidden');
+        }
+
+        function displayResult(plan) {
+            const referencesHtml = plan.references && plan.references.length > 0
+                ? plan.references.map(ref => `
+                    <li class="mb-1">
+                        <a href="${ref.url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200 group text-sm">
+                            ${ref.title}
+                            <i class="ph-bold ph-arrow-square-out opacity-70 group-hover:opacity-100 ml-1"></i>
+                        </a>
+                    </li>`).join('')
+                : '<li>根拠となる情報は見つけられなかった。</li>';
+
+            resultCard.innerHTML = `
+                <div class="p-6 md:p-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                           <h2 class="text-2xl md:text-3xl font-bold text-gray-900">${plan.ideaName || '無題のアイデア'}</h2>
+                           <p class="text-blue-700 font-semibold">${plan.concept || ''}</p>
+                        </div>
+                        <button onclick="copyToClipboard(this)" class="copy-btn p-2 rounded-full hover:bg-gray-200 transition-colors duration-200" title="結果をコピー">
+                            <i class="ph ph-copy text-2xl text-gray-500"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-6">
+                        ${createSection('市場分析と機会', 'ph-duotone ph-chart-line', plan.marketAnalysis)}
+                        ${createSection('ターゲット顧客', 'ph-duotone ph-users-three', plan.targetCustomer)}
+                        ${createSection('独自の提供価値', 'ph-duotone ph-star', plan.valueProposition)}
+                        ${createSection('収益モデル', 'ph-duotone ph-coins', plan.revenueModel)}
+                        ${createSection('最初の一歩', 'ph-duotone ph-footprints', plan.firstStep)}
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 flex items-center mb-2">
+                                <i class="ph-duotone ph-books text-xl mr-3 text-blue-600"></i>
+                                参考情報
+                            </h3>
+                            <ul class="text-gray-600 ml-9 list-disc list-inside space-y-1">${referencesHtml}</ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            resultCard.classList.remove('hidden');
+        }
+        
+        function createSection(title, iconClass, text) {
+            if (!text) return '';
+            return `
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 flex items-center mb-2">
+                        <i class="${iconClass} text-xl mr-3 text-blue-600"></i>
+                        ${title}
+                    </h3>
+                    <p class="text-gray-700 ml-9 whitespace-pre-wrap">${text || '情報なし'}</p>
+                </div>
+            `;
+        }
+
+        function copyToClipboard(buttonElement) {
+            const card = document.getElementById('result-card');
+            let textToCopy = '';
+            
+            const title = card.querySelector('h2').innerText;
+            const concept = card.querySelector('p').innerText;
+            textToCopy += `事業名: ${title}\nコンセプト: ${concept}\n\n`;
+
+            card.querySelectorAll('div.space-y-6 > div').forEach(section => {
+                const h3 = section.querySelector('h3');
+                if (h3) {
+                    const title = h3.innerText;
+                    textToCopy += `--- ${title} ---\n`;
+                    if (section.querySelector('ul')) {
+                        section.querySelectorAll('li').forEach(li => {
+                            textToCopy += `- ${li.innerText}\n`;
+                        });
+                    } else {
+                        const content = section.querySelector('p');
+                        textToCopy += (content ? content.innerText : '') + '\n';
+                    }
+                    textToCopy += '\n';
+                }
+            });
+
+            const textArea = document.createElement('textarea');
+            textArea.style.position = 'absolute';
+            textArea.style.left = '-9999px';
+            textArea.value = textToCopy.trim();
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                const originalIcon = buttonElement.innerHTML;
+                buttonElement.innerHTML = `<i class="ph ph-check-circle text-2xl text-green-500"></i>`;
+                buttonElement.title = "コピーしたぞ！";
+                setTimeout(() => {
+                    buttonElement.innerHTML = originalIcon;
+                    buttonElement.title = "結果をコピー";
+                }, 2000);
+            } catch (err) {
+                console.error('コピーに失敗', err);
+                buttonElement.title = "コピー失敗だ";
+            }
+            document.body.removeChild(textArea);
+        }
+    </script>
+</body>
+</html>
