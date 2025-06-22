@@ -147,7 +147,7 @@
         generateBtn.addEventListener('click', async () => {
             const apiKey = "AIzaSyBeI8y4v-TzZuoEA6MFDcy62jU4O9UwMZE"; //
             
-            if (!apiKey || apiKey === "") {
+            if (!apiKey || apiKey === "AIzaSyBeI8y4v-TzZuoEA6MFDcy62jU4O9UwMZE") {
                 resetUI();
                 showError("APIキーが設定されていません。コード内の 'apiKey' 変数に、あなたが取得したGoogle AI StudioのAPIキーを設定してください。");
                 penguinText.textContent = "APIキーがないと動けんぞ。";
